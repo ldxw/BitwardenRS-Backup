@@ -2,6 +2,7 @@
 
 . /app/includes.sh
 
+RESTORE_FILE_DATA=""
 RESTORE_FILE_DB=""
 RESTORE_FILE_CONFIG=""
 RESTORE_FILE_ATTACHMENTS=""
@@ -15,6 +16,7 @@ function clear_extract_dir() {
 function restore_zip() {
     color blue "restore bitwarden_rs backup zip file"
 
+    local FIND_FILE_DATA
     local FIND_FILE_DB
     local FIND_FILE_CONFIG
     local FIND_FILE_ATTACHMENTS
@@ -30,6 +32,13 @@ function restore_zip() {
     else
         color red "extract bitwarden_rs backup zip file failed"
         exit 1
+    fi
+
+    # get restore data file
+    RESTORE_FILE_DATA=""
+    FIND_FILE_DB=$(basename $(ls ${RESTORE_EXTRACT_DIR}/.*.tar))
+    if [[ -n "${FIND_FILE_DATA}" ]]; then
+        RESTORE_FILE_DATA="extract/${FIND_FILE_DATA}"
     fi
 
     # get restore db file
@@ -55,6 +64,18 @@ function restore_zip() {
 
     RESTORE_FILE_ZIP=""
     restore_file
+}
+
+function restore_data() {
+    color blue "restore bitwarden_rs data"
+
+    cp -f ${RESTORE_FILE_DATA} ${DATA_DATA}
+
+    if [[ $? == 0 ]]; then
+        color green "restore bitwarden_rs data successful"
+    else
+        color red "restore bitwarden_rs data failed"
+    fi
 }
 
 function restore_db() {
@@ -111,6 +132,13 @@ function restore_file() {
         restore_zip
         clear_extract_dir
     else
+        
+        if [[ -n "${RESTORE_FILE_DATA}" ]]; then
+            check_restore_file_exist ${RESTORE_FILE_DATA} "--data-file"
+
+            RESTORE_FILE_DB="${RESTORE_DIR}/${RESTORE_FILE_DATA}"
+        fi
+        
         if [[ -n "${RESTORE_FILE_DB}" ]]; then
             check_restore_file_exist ${RESTORE_FILE_DB} "--db-file"
 
@@ -129,6 +157,9 @@ function restore_file() {
             RESTORE_FILE_ATTACHMENTS="${RESTORE_DIR}/${RESTORE_FILE_ATTACHMENTS}"
         fi
 
+        if [[ -n "${RESTORE_FILE_DATA}" ]]; then
+            restore_data
+        fi
         if [[ -n "${RESTORE_FILE_DB}" ]]; then
             restore_db
         fi
@@ -142,10 +173,10 @@ function restore_file() {
 }
 
 function check_empty_input() {
-    if [[ -z "${RESTORE_FILE_ZIP}${RESTORE_FILE_DB}${RESTORE_FILE_CONFIG}${RESTORE_FILE_ATTACHMENTS}" ]]; then
+    if [[ -z "${RESTORE_FILE_ZIP}${RESTORE_FILE_DATA}${RESTORE_FILE_DB}${RESTORE_FILE_CONFIG}${RESTORE_FILE_ATTACHMENTS}" ]]; then
         color yellow "Empty input"
         color none ""
-        color none "Find out more at https://github.com/ttionya/BitwardenRS-Backup#restore"
+        color none "Find out more at https://github.com/ldxw/BitwardenRS-Backup#restore"
         exit 0
     fi
 }
@@ -170,6 +201,11 @@ function restore() {
             --zip-file)
                 shift
                 RESTORE_FILE_ZIP=$(basename "$1")
+                shift
+                ;;           
+            --data-file)
+                shift
+                RESTORE_FILE_DATA=$(basename "$1")
                 shift
                 ;;
             --db-file)
