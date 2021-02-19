@@ -36,8 +36,8 @@ jobs:
         with:
           context: '.'
           file: './Dockerfile'
-          platforms: 'linux/amd64,linux/386'
+          platforms: 'linux/amd64,linux/386,linux/arm64'
           push: true
           tags: |
-            ttionya/bitwardenrs-backup:latest
-            ttionya/bitwardenrs-backup:${{ steps.pre.outputs.tag }}
+            ldxw/bitwardenrs-backup:latest
+            ldxw/bitwardenrs-backup:${{ steps.pre.outputs.tag }}
