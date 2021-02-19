@@ -7,6 +7,7 @@ LABEL "repository"="https://github.com/ldxw/BitwardenRS-Backup" \
 COPY scripts/*.sh /app/
 
 RUN chmod +x /app/*.sh \
+  && sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
   && apk add --no-cache sqlite zip heirloom-mailx tzdata
 
 ENTRYPOINT ["/app/entrypoint.sh"]
