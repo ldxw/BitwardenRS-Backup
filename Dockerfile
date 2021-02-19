@@ -1,8 +1,8 @@
 FROM rclone/rclone:1.53.2
 
-LABEL "repository"="https://github.com/ttionya/BitwardenRS-Backup" \
-  "homepage"="https://github.com/ttionya/BitwardenRS-Backup" \
-  "maintainer"="ttionya <git@ttionya.com>"
+LABEL "repository"="https://github.com/ldxw/BitwardenRS-Backup" \
+  "homepage"="https://github.com/ldxw/BitwardenRS-Backup" \
+  "maintainer"="ldxw <git@ldxw.top>"
 
 COPY scripts/*.sh /app/
 
