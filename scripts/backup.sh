@@ -3,6 +3,8 @@
 . /app/includes.sh
 
 TODAY=$(date +%Y%m%d)
+# backup bitwarden_rs data file
+BACKUP_FILE_DATA="${BACKUP_DIR}/backup-data.${TODAY}.zip"
 # backup bitwarden_rs database file
 BACKUP_FILE_DB="${BACKUP_DIR}/db.${TODAY}.sqlite3"
 # backup bitwarden_rs config file
@@ -14,6 +16,22 @@ BACKUP_FILE_ZIP="${BACKUP_DIR}/backup.${TODAY}.zip"
 
 function clear_dir() {
     rm -rf ${BACKUP_DIR}
+}
+
+function backup_data() {
+    color blue "backup bitwarden_rs data"
+
+    local DATA_ATTACHMENTS="data"
+
+    if [[ -d "${DATA_DIR}/${DATA_DATA}" ]]; then
+        tar -c -C ${DATA_DIR} -f ${BACKUP_FILE_DATA} ${DATA_DATA}
+
+        color blue "display data tar file list"
+
+        tar -tf ${BACKUP_FILE_DATA}
+    else
+        color yellow "not found bitwarden_rs data directory, skipping"
+    fi
 }
 
 function backup_db() {
@@ -55,6 +73,7 @@ function backup_attachments() {
 function backup() {
     mkdir -p ${BACKUP_DIR}
 
+    backup_data
     backup_db
     backup_config
     backup_attachments
