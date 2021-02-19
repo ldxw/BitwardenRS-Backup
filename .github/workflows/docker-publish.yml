@@ -41,4 +41,3 @@ jobs:
           tags: |
             ldxw/bitwardenrs-backup:latest
             ldxw/bitwardenrs-backup:${{ steps.pre.outputs.tag }}
-
